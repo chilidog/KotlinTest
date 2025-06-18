@@ -1,13 +1,6 @@
 {
     "name": "KotlinTest",
     "image": "mcr.microsoft.com/devcontainers/java:17",
-    "features": {
-        "ghcr.io/devcontainers/features/java:1": {
-            "version": "17",
-            "installMaven": true,
-            "installGradle": true
-        }
-    },
     "customizations": {
         "vscode": {
             "extensions": [
@@ -23,6 +16,10 @@
                 "kotlin.debugAdapter.enabled": true
             }
         }
+    },
+    "features": {
+        "ghcr.io/devcontainers/features/gradle:1": {},
+        "ghcr.io/devcontainers/features/maven:1": {}
     },
     "postCreateCommand": "echo 'Kotlin development environment is ready!'"
 }
