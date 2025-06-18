@@ -1,0 +1,28 @@
+{
+    "name": "KotlinTest",
+    "image": "mcr.microsoft.com/devcontainers/java:17",
+    "features": {
+        "ghcr.io/devcontainers/features/java:1": {
+            "version": "17",
+            "installMaven": true,
+            "installGradle": true
+        }
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "fwcd.kotlin",
+                "mathiasfrohlich.kotlin",
+                "vscjava.vscode-java-pack",
+                "github.copilot",
+                "github.vscode-pull-request-github"
+            ],
+            "settings": {
+                "java.configuration.updateBuildConfiguration": "automatic",
+                "kotlin.languageServer.enabled": true,
+                "kotlin.debugAdapter.enabled": true
+            }
+        }
+    },
+    "postCreateCommand": "echo 'Kotlin development environment is ready!'"
+}
