@@ -1,0 +1,22 @@
+# IDE files
+.vs/
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Build output
+target/
+build/
+out/
+bin/
+
+# Package Files
+*.jar
+*.war
+*.zip
+*.tar.gz
+*.rar
+
+# OS specific files
+Thumbs.db
