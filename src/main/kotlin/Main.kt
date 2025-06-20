@@ -1,7 +1,7 @@
 // Global configuration object for OS detection
 object SystemConfig {
-    // Global variable to determine OS type with default value "Ubuntu"
-    var osType: String = "Ubuntu"
+    // Global variable to determine OS type with default value "Alpine" (matches Codespace environment)
+    var osType: String = "Alpine"
         set(value) {
             val supportedOSes = listOf("CachyOS", "Ubuntu", "Alpine")
             if (supportedOSes.any { it.equals(value, ignoreCase = true) }) {
