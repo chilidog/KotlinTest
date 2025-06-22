@@ -1,7 +1,12 @@
-// ControlStation Drone Management System
-// Built on proven SystemConfig foundation with flight operations
+// Enhanced ControlStation Drone Management System with WebSocket Communication
+// Built on proven SystemConfig foundation with enterprise-grade flight operations
 
 import kotlinx.coroutines.*
+import com.controlstation.orchestrator.*
+import com.controlstation.communication.*
+import com.controlstation.safety.*
+import com.controlstation.flight.*
+import org.slf4j.LoggerFactory
 
 // Keep your PERFECT SystemConfig pattern - it's ideal for drone operations!
 object SystemConfig {
@@ -53,130 +58,20 @@ object SystemConfig {
     }
 }
 
-// Flight Controller Interface - Chapter 1
-interface FlightController {
-    fun sendCommand(cmd: String)
-    fun getTelemetry(): String
-}
 
-// Simulated Flight Controller - Chapter 3
-class SimulatedFlightController : FlightController {
-    private var altitude: Double = 0.0
-    private var isFlying: Boolean = false
-    
-    override fun sendCommand(cmd: String) {
-        when (cmd.uppercase()) {
-            "TAKEOFF" -> {
-                altitude = 10.0
-                isFlying = true
-                println("SimDrone: Taking off to ${altitude}m altitude")
-            }
-            "LAND" -> {
-                altitude = 0.0
-                isFlying = false
-                println("SimDrone: Landing complete")
-            }
-            "HOVER" -> {
-                println("SimDrone: Hovering at ${altitude}m")
-            }
-            else -> println("SimDrone: Unknown command '$cmd'")
-        }
-    }
-    
-    override fun getTelemetry(): String {
-        return "Altitude: ${altitude}m, Flying: $isFlying, Battery: 85%, GPS: Active"
-    }
-}
 
-// Real Flight Controller - Chapter 1 (placeholder for real hardware)
-class RealFlightController : FlightController {
-    override fun sendCommand(cmd: String) {
-        println("RealDrone: Sending '$cmd' to physical hardware via MAVLink")
-        // Real implementation would interface with actual drone hardware
-    }
-    
-    override fun getTelemetry(): String {
-        return "RealDrone: Hardware telemetry - GPS: 47.6062°N, 122.3321°W, Alt: 15m"
-    }
-}
-
-// Communication Module - Chapter 4
-class CommunicationModule(private val flightController: FlightController) {
-    private var isConnected = false
-    
-    suspend fun connect(address: String) {
-        println("CommModule: Connecting to $address...")
-        delay(1000) // Simulate connection time
-        isConnected = true
-        println("CommModule: Connected successfully")
-        
-        // Start telemetry streaming
-        while (isConnected) {
-            val telemetry = flightController.getTelemetry()
-            println("CommModule: Streaming telemetry - $telemetry")
-            delay(2000) // Send telemetry every 2 seconds
-        }
-    }
-    
-    fun getStatus(): String = if (isConnected) "CONNECTED" else "DISCONNECTED"
-}
-
-// Safety Module - Chapter 4
-class SafetyModule(
-    private val flightController: FlightController,
-    private val communicationModule: CommunicationModule
-) {
-    suspend fun monitorSafety() {
-        println("SafetyModule: Starting safety monitoring")
-        while (true) {
-            // Check communication status
-            val commStatus = communicationModule.getStatus()
-            if (commStatus == "DISCONNECTED") {
-                println("SafetyModule: ⚠️ CRITICAL - Communication lost! Initiating emergency landing")
-                flightController.sendCommand("LAND")
-            }
-            
-            // Monitor telemetry for safety issues
-            val telemetry = flightController.getTelemetry()
-            if (telemetry.contains("Battery: 15%") || telemetry.contains("Battery: 10%")) {
-                println("SafetyModule: ⚠️ WARNING - Low battery detected! Preparing return to home")
-                flightController.sendCommand("LAND")
-            }
-            
-            delay(3000) // Check every 3 seconds
-        }
-    }
-}
-
-// Flight System - Chapter 2
-class FlightSystem(private val flightController: FlightController) {
-    suspend fun start() {
-        println("FlightSystem: Starting autonomous flight operations")
-        
-        // Execute a simple mission
-        println("FlightSystem: Mission - Takeoff, hover, and land")
-        
-        flightController.sendCommand("TAKEOFF")
-        delay(3000)
-        
-        flightController.sendCommand("HOVER")
-        delay(5000)
-        
-        println("FlightSystem: Mission complete, initiating landing")
-        flightController.sendCommand("LAND")
-    }
-}
-
-// Main application - Your proven template enhanced with flight operations!
+// Main application - Enhanced with WebSocket communication and robust safety systems!
 fun main() = runBlocking {
-    println("Hello, ControlStation!")
+    val logger = LoggerFactory.getLogger("ControlStation")
+    
+    println("🚁 Welcome to Enhanced ControlStation with WebSocket Communication!")
     
     // Keep your proven environment-aware application startup
     println("\n=== System Configuration ===")
     SystemConfig.displayConfig()
     
-    // Keep your proven interactive configuration with defaults - now for flight!
-    println("\n=== ControlStation Configuration ===")
+    // Keep your proven interactive configuration with defaults - now for advanced flight!
+    println("\n=== Enhanced ControlStation Configuration ===")
     print("Enter OS type (CachyOS/Ubuntu/Alpine) or press Enter for default (${SystemConfig.osType}): ")
     val osInput = readLine()?.trim()
     if (!osInput.isNullOrEmpty()) {
@@ -192,99 +87,167 @@ fun main() = runBlocking {
     println("\nUpdated configuration:")
     SystemConfig.displayConfig()
     
-    // Keep your proven OS-specific behavior pattern - now optimized for flight!
-    println("\n=== ControlStation Environment Configuration ===")
+    // Keep your proven OS-specific behavior pattern - now optimized for enterprise flight!
+    println("\n=== Enhanced ControlStation Environment Configuration ===")
     when {
         SystemConfig.isCachyOS() -> {
-            println("Configuring ControlStation for CachyOS:")
-            println("- High-performance real-time flight control")
-            println("- Direct hardware access for real drones")
-            println("- Performance-optimized AI processing")
-            println("- Low-latency communication systems")
+            println("Configuring Enhanced ControlStation for CachyOS:")
+            println("- High-performance WebSocket communication")
+            println("- Real-time telemetry processing")
+            println("- Advanced safety monitoring systems")
+            println("- Enterprise-grade flight control")
         }
         SystemConfig.isUbuntu() -> {
-            println("Configuring ControlStation for Ubuntu:")
-            println("- Production-grade drone operations")
-            println("- Enterprise safety monitoring")
-            println("- Robust communication protocols")
-            println("- Reliable flight management")
+            println("Configuring Enhanced ControlStation for Ubuntu:")
+            println("- Production WebSocket endpoints")
+            println("- Robust error handling and reconnection")
+            println("- Enterprise safety protocols")
+            println("- Reliable mission execution")
         }
         SystemConfig.isAlpine() -> {
-            println("Configuring ControlStation for Alpine Linux:")
-            println("- Lightweight containerized flight operations")
-            println("- Minimal resource drone simulation")
-            println("- Container-optimized networking")
-            println("- Efficient concurrent operations")
+            println("Configuring Enhanced ControlStation for Alpine Linux:")
+            println("- Lightweight WebSocket containers")
+            println("- Efficient concurrent telemetry")
+            println("- Minimal resource safety monitoring")
+            println("- Optimized coroutine-based operations")
         }
     }
     
-    // REPLACE CALCULATOR WITH FLIGHT CONTROLLER! 🚀
-    println("\n=== ControlStation Flight Operations ===")
-    
-    // Environment-aware flight controller selection using your proven patterns
-    val flightController = when {
-        SystemConfig.isAlpine() && SystemConfig.isSimulatedFlight() -> {
-            println("Initializing: SimulatedFlightController (optimal for Alpine containers)")
-            SimulatedFlightController()
-        }
-        SystemConfig.isCachyOS() && SystemConfig.isRealFlight() -> {
-            println("Initializing: RealFlightController (high-performance for CachyOS)")
-            RealFlightController()
-        }
-        else -> {
-            println("Initializing: SimulatedFlightController (safe default)")
-            SimulatedFlightController()
-        }
+    // Create configuration based on SystemConfig
+    val environment = when {
+        SystemConfig.isAlpine() -> Environment.ALPINE
+        SystemConfig.isCachyOS() -> Environment.CACHYOS
+        SystemConfig.isUbuntu() -> Environment.UBUNTU
+        else -> Environment.ALPINE
     }
     
-    // Initialize support systems - Chapter 4
-    val communicationModule = CommunicationModule(flightController)
-    val safetyModule = SafetyModule(flightController, communicationModule)
-    val flightSystem = FlightSystem(flightController)
-    
-    println("ControlStation: All subsystems initialized with ${SystemConfig.osType} optimization")
-    
-    // Launch concurrent operations - Chapter 6
-    val connectionString = when {
-        SystemConfig.isAlpine() -> "ws://localhost:8080"           // Container networking
-        SystemConfig.isCachyOS() -> "ws://controlstation.local:8080" // Performance networking  
-        SystemConfig.isUbuntu() -> "ws://production.domain:8080"    // Production endpoint
-        else -> "ws://localhost:8080"
+    val flightMode = when {
+        SystemConfig.isRealFlight() -> FlightMode.REAL
+        SystemConfig.isSimulatedFlight() -> FlightMode.SIMULATED
+        SystemConfig.isHybridFlight() -> FlightMode.HYBRID
+        else -> FlightMode.SIMULATED
     }
     
-    val jobs = listOf(
-        launch(Dispatchers.Default) {
-            println("Starting FlightSystem with ${SystemConfig.flightMode} mode...")
-            flightSystem.start()
-        },
-        launch(Dispatchers.IO) {
-            println("Starting CommunicationModule...")
-            communicationModule.connect(connectionString)
-        },
-        launch(Dispatchers.Default) {
-            println("Starting SafetyModule...")
-            safetyModule.monitorSafety()
-        }
+    val config = ControlStationConfig(
+        environment = environment,
+        flightMode = flightMode,
+        enableAdvancedFeatures = true,
+        logLevel = "INFO"
     )
     
-    println("\n=== ControlStation Fully Operational! ===")
-    println("🚁 Flight operations: ${SystemConfig.flightMode}")
-    println("🖥️  Environment: ${SystemConfig.osType} optimized")
-    println("📡 Communication: Active")
-    println("🛡️  Safety monitoring: Active")
-    println("⚡ Concurrent systems: ${jobs.size} active")
+    println("\n=== Enhanced ControlStation Flight Operations ===")
+    println("🚀 Initializing WebSocket-based communication system...")
+    println("📡 WebSocket endpoint: ${when (environment) {
+        Environment.ALPINE -> "ws://localhost:8080 (container networking)"
+        Environment.CACHYOS -> "ws://controlstation.local:8080 (performance networking)"
+        Environment.UBUNTU -> "ws://production.domain:8080 (production endpoint)"
+    }}")
     
-    // Let it run for a demo, then gracefully shutdown
-    delay(15000) // Run for 15 seconds
+    // Initialize the enhanced orchestrator
+    val orchestrator = ControlStationOrchestrator(config)
     
-    println("\n=== Demo Complete - ControlStation Ready for Real Missions! ===")
-    println("Your SystemConfig foundation successfully powers:")
-    println("✅ Flight Control Operations")
-    println("✅ Real-time Communication")
-    println("✅ Safety Monitoring") 
-    println("✅ Concurrent System Management")
-    println("✅ Environment-aware Optimization")
-    
-    jobs.forEach { it.cancel() }
+    try {
+        // Start the enhanced control station
+        println("\n🔧 Starting enhanced subsystems...")
+        orchestrator.start()
+        
+        // Monitor system status
+        launch {
+            orchestrator.systemStatus.collect { status ->
+                when (status) {
+                    SystemStatus.INITIALIZING -> logger.info("System initializing...")
+                    SystemStatus.OPERATIONAL -> println("✅ ControlStation fully operational!")
+                    SystemStatus.CRITICAL -> println("⚠️ CRITICAL: System in critical state!")
+                    SystemStatus.ERROR -> println("❌ ERROR: System error detected!")
+                    SystemStatus.SHUTTING_DOWN -> println("🔄 System shutting down...")
+                    SystemStatus.STOPPED -> println("🛑 System stopped")
+                }
+            }
+        }
+        
+        // Wait for system to be operational
+        while (orchestrator.systemStatus.value != SystemStatus.OPERATIONAL) {
+            delay(500)
+        }
+        
+        println("\n=== Enhanced ControlStation Fully Operational! ===")
+        println("🚁 WebSocket Communication: Active")
+        println("📊 Real-time Telemetry: Streaming")
+        println("🛡️ Enhanced Safety Monitoring: Active")
+        println("🎯 Mission Control: Ready")
+        println("⚡ Environment: ${SystemConfig.osType} optimized")
+        println("🔧 Flight mode: ${SystemConfig.flightMode}")
+        
+        // Display system status
+        val systemStatus = orchestrator.getSystemStatus()
+        println("\n📋 System Status Summary:")
+        println("- Communication: ${if (systemStatus.communicationHealth.isConnected) "✅ Connected" else "❌ Disconnected"}")
+        println("- Flight Controller: ${if (systemStatus.flightControllerStatus.isConnected) "✅ Ready" else "❌ Not Ready"}")
+        println("- Safety Systems: ${systemStatus.safetySummary.status}")
+        println("- Messages Sent: ${systemStatus.communicationHealth.messagesSent}")
+        println("- Messages Received: ${systemStatus.communicationHealth.messagesReceived}")
+        
+        // Execute demonstration mission
+        println("\n🎯 Executing demonstration mission...")
+        launch {
+            orchestrator.missionStatus.collect { status ->
+                when (status) {
+                    MissionStatus.EXECUTING -> println("🚀 Mission executing...")
+                    MissionStatus.COMPLETED -> println("✅ Mission completed successfully!")
+                    MissionStatus.FAILED -> println("❌ Mission failed!")
+                    MissionStatus.ABORTED -> println("⏹️ Mission aborted")
+                    else -> {}
+                }
+            }
+        }
+        
+        // Run the appropriate mission based on configuration
+        when (flightMode) {
+            FlightMode.SIMULATED -> {
+                println("Starting simulated flight demonstration...")
+                orchestrator.executeMission(MissionType.BASIC_FLIGHT)
+            }
+            FlightMode.REAL -> {
+                println("Starting real flight operations...")
+                orchestrator.executeMission(MissionType.AUTONOMOUS_PATROL)
+            }
+            FlightMode.HYBRID -> {
+                println("Starting hybrid mode demonstration...")
+                orchestrator.executeMission(MissionType.EMERGENCY_RESPONSE)
+            }
+        }
+        
+        // Let the system run for demonstration
+        delay(45000) // Run for 45 seconds
+        
+        // Display final status
+        val finalStatus = orchestrator.getSystemStatus()
+        println("\n� Final System Statistics:")
+        println("- Total Messages Sent: ${finalStatus.communicationHealth.messagesSent}")
+        println("- Total Messages Received: ${finalStatus.communicationHealth.messagesReceived}")
+        println("- Connection Uptime: ${finalStatus.communicationHealth.connectionStartTime?.let { 
+            (System.currentTimeMillis() - it) / 1000 
+        }}s")
+        println("- Safety Status: ${finalStatus.safetySummary.status}")
+        
+        println("\n=== Enhanced ControlStation Demo Complete! ===")
+        println("🏆 Your SystemConfig foundation successfully powers:")
+        println("✅ WebSocket Communication with Error Handling")
+        println("✅ Real-time Telemetry Streaming")
+        println("✅ Advanced Safety Monitoring")
+        println("✅ Coroutine-based Concurrent Operations")
+        println("✅ Environment-aware Optimization")
+        println("✅ Enterprise-grade Mission Control")
+        println("✅ Robust Reconnection Logic")
+        println("✅ Comprehensive Health Monitoring")
+        
+    } catch (e: Exception) {
+        logger.error("ControlStation error", e)
+        println("❌ ControlStation encountered an error: ${e.message}")
+    } finally {
+        println("\n🔄 Shutting down Enhanced ControlStation...")
+        orchestrator.stop()
+        println("👋 Enhanced ControlStation shutdown complete!")
+    }
 }
 
