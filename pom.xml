@@ -32,7 +32,14 @@
         <kotlin-test.version>1.9.10</kotlin-test.version>
         
         <!-- Main class for execution -->
-        <main.class>MainKt</main.class>
+        <main.class>ControlStationKt</main.class>
+        
+        <!-- Universal path properties - will be overridden by profiles -->
+        <source.directory>src/main/kotlin</source.directory>
+        <test.source.directory>src/test/kotlin</test.source.directory>
+        <resources.directory>src/main/resources</resources.directory>
+        <output.directory>${project.build.directory}/classes</output.directory>
+        <test.output.directory>${project.build.directory}/test-classes</test.output.directory>
     </properties>
     
     <dependencies>
@@ -93,9 +100,93 @@
         </dependency>
     </dependencies>
     
+    <!-- Environment-aware profiles for different development environments -->
+    <profiles>
+        <!-- GitHub Codespaces Profile -->
+        <profile>
+            <id>codespace</id>
+            <activation>
+                <property>
+                    <name>env.CODESPACES</name>
+                    <value>true</value>
+                </property>
+            </activation>
+            <properties>
+                <environment.type>codespace</environment.type>
+                <!-- Codespace paths are already universal -->
+            </properties>
+        </profile>
+        
+        <!-- WSL Profile -->
+        <profile>
+            <id>wsl</id>
+            <activation>
+                <os>
+                    <name>Linux</name>
+                </os>
+                <property>
+                    <name>env.WSL_DISTRO_NAME</name>
+                </property>
+            </activation>
+            <properties>
+                <environment.type>wsl</environment.type>
+                <!-- Force Unix-style paths for WSL -->
+                <path.separator>/</path.separator>
+            </properties>
+        </profile>
+        
+        <!-- Windows Profile -->
+        <profile>
+            <id>windows</id>
+            <activation>
+                <os>
+                    <family>windows</family>
+                </os>
+            </activation>
+            <properties>
+                <environment.type>windows</environment.type>
+                <path.separator>\</path.separator>
+            </properties>
+        </profile>
+        
+        <!-- Unix/Linux Profile -->
+        <profile>
+            <id>unix</id>
+            <activation>
+                <os>
+                    <family>unix</family>
+                </os>
+            </activation>
+            <properties>
+                <environment.type>unix</environment.type>
+                <path.separator>/</path.separator>
+            </properties>
+        </profile>
+        
+        <!-- Development Profile (can be activated manually) -->
+        <profile>
+            <id>dev</id>
+            <properties>
+                <maven.compiler.debug>true</maven.compiler.debug>
+                <maven.compiler.optimize>false</maven.compiler.optimize>
+            </properties>
+        </profile>
+        
+        <!-- Production Profile (can be activated manually) -->
+        <profile>
+            <id>prod</id>
+            <properties>
+                <maven.compiler.debug>false</maven.compiler.debug>
+                <maven.compiler.optimize>true</maven.compiler.optimize>
+            </properties>
+        </profile>
+    </profiles>
+    
     <build>
-        <sourceDirectory>src/main/kotlin</sourceDirectory>
-        <testSourceDirectory>src/test/kotlin</testSourceDirectory>
+        <sourceDirectory>${source.directory}</sourceDirectory>
+        <testSourceDirectory>${test.source.directory}</testSourceDirectory>
+        <outputDirectory>${output.directory}</outputDirectory>
+        <testOutputDirectory>${test.output.directory}</testOutputDirectory>
         
         <plugins>
             <!-- Kotlin Maven Plugin -->
