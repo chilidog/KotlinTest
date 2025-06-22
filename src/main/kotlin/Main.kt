@@ -32,7 +32,7 @@ object SystemConfig {
 }
 
 fun main() {
-    println("Hello, ControlStation!")
+    println("Hello, PROJECT_TEMPLATE!")
     
     // Template: Environment-aware application startup
     println("\n=== System Configuration Template ===")
