@@ -1,7 +1,10 @@
-// Global configuration object for OS detection
+// Template Kotlin Application with Global Configuration Pattern
+// This demonstrates professional Kotlin development practices
+
+// Global configuration object - Template Pattern for Environment-Aware Applications
 object SystemConfig {
-    // Global variable to determine OS type with default value "Alpine" (matches Codespace environment)
-    var osType: String = "Alpine"
+    // Global variable with validation - Template for robust configuration management
+    var osType: String = "Alpine"  // Default optimized for container environments
         set(value) {
             val supportedOSes = listOf("CachyOS", "Ubuntu", "Alpine")
             if (supportedOSes.any { it.equals(value, ignoreCase = true) }) {
@@ -11,19 +14,15 @@ object SystemConfig {
             }
         }
     
-    // Helper function to check if we're configuring for CachyOS
+    // Helper functions - Template for clean boolean checks
     fun isCachyOS(): Boolean = osType.equals("CachyOS", ignoreCase = true)
-    
-    // Helper function to check if we're configuring for Ubuntu
     fun isUbuntu(): Boolean = osType.equals("Ubuntu", ignoreCase = true)
-    
-    // Helper function to check if we're configuring for Alpine
     fun isAlpine(): Boolean = osType.equals("Alpine", ignoreCase = true)
     
-    // Function to get supported OS types
+    // Template for extensible configuration
     fun getSupportedOSes(): List<String> = listOf("CachyOS", "Ubuntu", "Alpine")
     
-    // Function to display current configuration
+    // Template for comprehensive status display
     fun displayConfig() {
         println("Current OS configuration: $osType")
         println("Configuring for CachyOS: ${isCachyOS()}")
@@ -33,14 +32,14 @@ object SystemConfig {
 }
 
 fun main() {
-    println("Hello, Kotlin Test World!")
+    println("Hello, ControlStation!")
     
-    // Display default configuration
-    println("\n=== System Configuration ===")
+    // Template: Environment-aware application startup
+    println("\n=== System Configuration Template ===")
     SystemConfig.displayConfig()
     
-    // Demonstrate changing the OS type
-    println("\n=== Changing OS Configuration ===")
+    // Template: Interactive configuration with defaults
+    println("\n=== Configuration Demo ===")
     print("Enter OS type (CachyOS/Ubuntu/Alpine) or press Enter for default (${SystemConfig.osType}): ")
     val userInput = readLine()?.trim()
     
@@ -51,8 +50,8 @@ fun main() {
     println("\nUpdated configuration:")
     SystemConfig.displayConfig()
     
-    // Demonstrate OS-specific behavior
-    println("\n=== OS-Specific Configuration ===")
+    // Template: OS-specific behavior pattern
+    println("\n=== OS-Specific Configuration Template ===")
     when {
         SystemConfig.isCachyOS() -> {
             println("Configuring for CachyOS:")
@@ -62,7 +61,7 @@ fun main() {
         }
         SystemConfig.isUbuntu() -> {
             println("Configuring for Ubuntu:")
-            println("- Using apt package manager")
+            println("- Using apt package manager") 
             println("- Enabling Ubuntu-specific features")
             println("- Setting up Ubuntu repositories")
         }
@@ -75,12 +74,12 @@ fun main() {
         }
     }
     
-    // Calculator demonstration
-    println("\n=== Calculator Demo ===")
+    // Template: Additional functionality example
+    println("\n=== Template Feature Demo ===")
     val calculator = Calculator()
-    println("5 + 3 = ${calculator.add(5, 3)}")
-    println("10 - 4 = ${calculator.subtract(10, 4)}")
-    println("6 * 7 = ${calculator.multiply(6, 7)}")
-    println("15 / 3 = ${calculator.divide(15, 3)}")
+    println("Calculator example: 5 + 3 = ${calculator.add(5, 3)}")
+    
+    println("\n=== Template Ready for Your Application! ===")
+    println("Replace this demo code with your application logic.")
 }
 

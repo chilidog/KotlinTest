@@ -7,12 +7,12 @@
     <modelVersion>4.0.0</modelVersion>
     
     <groupId>com.example</groupId>
-    <artifactId>kotlin-test</artifactId>
+    <artifactId>your-project-name</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
     
-    <name>KotlinTest</name>
-    <description>A Kotlin project for testing and development with OS configuration support</description>
+    <name>Your Project Display Name</name>
+    <description>Your project description</description>
     
     <properties>
         <maven.compiler.source>11</maven.compiler.source>

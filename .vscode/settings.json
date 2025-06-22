@@ -1,0 +1,16 @@
+{
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.compile.nullAnalysis.mode": "automatic",
+    "java.build.tool": "maven",
+    "gradle.nestedProjects": false,
+    "java.import.gradle.enabled": false,
+    "java.import.maven.enabled": true,
+    "files.exclude": {
+        "**/.gradle": true,
+        "**/build": true,
+        "gradle.properties": true,
+        "gradlew": true,
+        "gradlew.bat": true,
+        "build.gradle*": true
+    }
+}
