@@ -7,11 +7,11 @@
     <modelVersion>4.0.0</modelVersion>
     
     <groupId>com.example</groupId>
-    <artifactId>your-project-name</artifactId>
+    <artifactId>control-station</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
     
-    <name>Your Project Display Name</name>
+    <name>ControlStation</name>
     <description>Your project description</description>
     
     <properties>
@@ -56,6 +56,13 @@
             <artifactId>junit-jupiter</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
+        </dependency>
+        
+        <!-- Coroutines Dependency -->
+        <dependency>
+            <groupId>org.jetbrains.kotlinx</groupId>
+            <artifactId>kotlinx-coroutines-core</artifactId>
+            <version>1.7.3</version>
         </dependency>
     </dependencies>
     
@@ -117,7 +124,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>${exec-maven-plugin.version}</version>
                 <configuration>
-                    <mainClass>${main.class}</mainClass>
+                    <mainClass>ControlStationKt</mainClass> <!-- Changed from MainKt to ControlStationKt -->
                 </configuration>
             </plugin>
         </plugins>
