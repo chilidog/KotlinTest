@@ -1,16 +1,19 @@
 package com.controlstation.orchestrator
 
 import com.controlstation.communication.*
+import com.controlstation.mavlink.*
 import com.controlstation.safety.*
 import com.controlstation.flight.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import org.slf4j.LoggerFactory
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicReference
 import java.util.UUID
 
 /**
  * Main orchestrator that coordinates all subsystems of the control station
+ * Enhanced with multi-protocol communication support
  */
 class ControlStationOrchestrator(
     private val configuration: ControlStationConfig
@@ -20,8 +23,13 @@ class ControlStationOrchestrator(
     private val isRunning = AtomicBoolean(false)
     private val orchestratorScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
     
+    // Enhanced communication subsystems
+    private lateinit var webSocketModule: WebSocketCommunicationModule
+    private lateinit var mavlinkModule: MAVLinkCommunicationModule
+    private lateinit var protocolAdapter: ProtocolAdapter
+    private lateinit var unifiedCommunicationManager: UnifiedCommunicationManager
+    
     // Core subsystems
-    private lateinit var communicationModule: WebSocketCommunicationModule
     private lateinit var flightController: EnhancedFlightController
     private lateinit var safetyModule: EnhancedSafetyModule
     
@@ -32,12 +40,16 @@ class ControlStationOrchestrator(
     private val _missionStatus = MutableStateFlow(MissionStatus.IDLE)
     val missionStatus: StateFlow<MissionStatus> = _missionStatus.asStateFlow()
     
+    private val _protocolStatus = MutableStateFlow<Map<String, Any>>(emptyMap())
+    val protocolStatus: StateFlow<Map<String, Any>> = _protocolStatus.asStateFlow()
+    
     /**
-     * Initialize and start all subsystems
+     * Initialize and start all subsystems with multi-protocol support
      */
     suspend fun start() {
         if (isRunning.compareAndSet(false, true)) {
-            logger.info("Starting ControlStation with configuration: ${configuration.environment}")
+            logger.info("Starting Enhanced ControlStation with configuration: ${configuration.environment}")
+            logger.info("Communication mode: ${configuration.communicationMode}")
             
             try {
                 initializeSubsystems()
@@ -45,10 +57,10 @@ class ControlStationOrchestrator(
                 setupSystemMonitoring()
                 
                 _systemStatus.value = SystemStatus.OPERATIONAL
-                logger.info("ControlStation fully operational")
+                logger.info("Enhanced ControlStation fully operational with multi-protocol support")
                 
             } catch (e: Exception) {
-                logger.error("Failed to start ControlStation", e)
+                logger.error("Failed to start Enhanced ControlStation", e)
                 _systemStatus.value = SystemStatus.ERROR
                 stop()
                 throw e
@@ -57,24 +69,25 @@ class ControlStationOrchestrator(
     }
     
     /**
-     * Stop all subsystems gracefully
+     * Stop all subsystems gracefully with multi-protocol cleanup
      */
     suspend fun stop() {
         if (isRunning.compareAndSet(true, false)) {
-            logger.info("Stopping ControlStation")
+            logger.info("Stopping Enhanced ControlStation")
             
             _systemStatus.value = SystemStatus.SHUTTING_DOWN
             
             try {
                 // Stop subsystems in reverse order
                 safetyModule.stop()
-                communicationModule.stop()
+                unifiedCommunicationManager.disconnect()
+                protocolAdapter.stopBridge()
                 
                 // Cancel all coroutines
                 orchestratorScope.cancel()
                 
                 _systemStatus.value = SystemStatus.STOPPED
-                logger.info("ControlStation stopped successfully")
+                logger.info("Enhanced ControlStation stopped successfully")
                 
             } catch (e: Exception) {
                 logger.error("Error during shutdown", e)
@@ -151,22 +164,61 @@ class ControlStationOrchestrator(
     }
     
     private suspend fun initializeSubsystems() {
-        logger.info("Initializing subsystems...")
+        logger.info("Initializing enhanced subsystems with multi-protocol support...")
         
-        // Initialize communication module
+        // Initialize WebSocket communication module
         val wsUrl = when (configuration.environment) {
             Environment.ALPINE -> "ws://localhost:8080"
             Environment.CACHYOS -> "ws://controlstation.local:8080"
             Environment.UBUNTU -> "ws://production.domain:8080"
         }
         
-        communicationModule = WebSocketCommunicationModule(
+        webSocketModule = WebSocketCommunicationModule(
             baseUrl = wsUrl,
             reconnectDelayMs = 5000,
             maxReconnectAttempts = if (configuration.flightMode == FlightMode.REAL) 20 else 10,
             heartbeatIntervalMs = 30000,
             telemetryIntervalMs = 1000
         )
+        
+        // Initialize MAVLink communication module if enabled
+        val mavlinkConfig = MAVLinkConnectionConfig(
+            connectionType = when (configuration.environment) {
+                Environment.ALPINE -> MAVLinkConnectionType.TCP
+                Environment.CACHYOS -> MAVLinkConnectionType.SERIAL
+                Environment.UBUNTU -> MAVLinkConnectionType.SERIAL
+            },
+            connectionString = when (configuration.environment) {
+                Environment.ALPINE -> "127.0.0.1:5760"
+                Environment.CACHYOS -> "/dev/ttyUSB0"
+                Environment.UBUNTU -> "/dev/ttyACM0"
+            },
+            baudRate = 57600,
+            systemId = 255,
+            componentId = 190
+        )
+        
+        mavlinkModule = MAVLinkCommunicationModule(mavlinkConfig)
+        
+        // Initialize protocol adapter
+        protocolAdapter = ProtocolAdapter(
+            webSocketProtocol = webSocketModule,
+            mavlinkProtocol = mavlinkModule
+        )
+        
+        // Initialize unified communication manager
+        val communicationProtocol = when (configuration.communicationMode) {
+            CommunicationMode.WEBSOCKET_ONLY -> webSocketModule
+            CommunicationMode.MAVLINK_ONLY -> mavlinkModule
+            CommunicationMode.UNIFIED -> {
+                unifiedCommunicationManager = UnifiedCommunicationManager(
+                    webSocketProtocol = webSocketModule,
+                    mavlinkProtocol = mavlinkModule,
+                    protocolAdapter = protocolAdapter
+                )
+                unifiedCommunicationManager
+            }
+        }
         
         // Initialize flight controller based on configuration
         flightController = when (configuration.flightMode) {
@@ -175,9 +227,9 @@ class ControlStationOrchestrator(
             FlightMode.HYBRID -> EnhancedSimulatedFlightController() // Use simulated for hybrid for now
         }
         
-        // Initialize safety module
+        // Initialize enhanced safety module with multi-protocol support
         safetyModule = EnhancedSafetyModule(
-            communicationModule = communicationModule,
+            communicationModule = communicationProtocol,
             emergencyLandingCallback = { reason ->
                 logger.error("SAFETY TRIGGER: Emergency landing - $reason")
                 flightController.performEmergencyLanding(reason)
@@ -191,30 +243,67 @@ class ControlStationOrchestrator(
     }
     
     private suspend fun startSubsystems() {
-        logger.info("Starting subsystems...")
+        logger.info("Starting enhanced subsystems...")
         
-        // Start communication module
-        communicationModule.start(orchestratorScope)
-        
-        // Wait for connection
-        var connectionWaitTime = 0
-        while (!communicationModule.connectionStatusFlow.value && connectionWaitTime < 30000) {
-            delay(1000)
-            connectionWaitTime += 1000
+        // Start communication based on mode
+        when (configuration.communicationMode) {
+            CommunicationMode.WEBSOCKET_ONLY -> {
+                webSocketModule.start(orchestratorScope)
+                waitForConnection(webSocketModule, "WebSocket")
+            }
+            CommunicationMode.MAVLINK_ONLY -> {
+                mavlinkModule.connect(mavlinkModule.getConnectionInfo())
+                waitForConnection(mavlinkModule, "MAVLink")
+            }
+            CommunicationMode.UNIFIED -> {
+                val connectionString = buildUnifiedConnectionString()
+                unifiedCommunicationManager.connect(connectionString)
+                waitForConnection(unifiedCommunicationManager, "Unified")
+            }
         }
         
-        if (!communicationModule.connectionStatusFlow.value) {
-            logger.warn("Communication module not connected after 30s, continuing with limited functionality")
+        // Initialize flight controller with appropriate communication module
+        val communicationProtocol = when (configuration.communicationMode) {
+            CommunicationMode.WEBSOCKET_ONLY -> webSocketModule
+            CommunicationMode.MAVLINK_ONLY -> mavlinkModule
+            CommunicationMode.UNIFIED -> unifiedCommunicationManager
         }
         
-        // Initialize flight controller with communication module
-        flightController.initialize(communicationModule)
+        flightController.initialize(communicationProtocol)
         
         // Start safety monitoring
         safetyModule.start(orchestratorScope)
         
-        logger.info("All subsystems started")
+        logger.info("All enhanced subsystems started")
     }
+    
+    private suspend fun waitForConnection(protocol: CommunicationProtocol, name: String) {
+        var connectionWaitTime = 0
+        while (!protocol.isConnected() && connectionWaitTime < 30000) {
+            delay(1000)
+            connectionWaitTime += 1000
+        }
+        
+        if (!protocol.isConnected()) {
+            logger.warn("$name protocol not connected after 30s, continuing with limited functionality")
+        } else {
+            logger.info("$name protocol connected successfully")
+        }
+    }
+    
+    private fun buildUnifiedConnectionString(): String {
+        val wsUrl = when (configuration.environment) {
+            Environment.ALPINE -> "ws://localhost:8080"
+            Environment.CACHYOS -> "ws://controlstation.local:8080"
+            Environment.UBUNTU -> "ws://production.domain:8080"
+        }
+        
+        val mavlinkConnection = when (configuration.environment) {
+            Environment.ALPINE -> "127.0.0.1:5760"
+            Environment.CACHYOS -> "/dev/ttyUSB0"
+            Environment.UBUNTU -> "/dev/ttyACM0"
+        }
+        
     
     private fun setupSystemMonitoring() {
         // Monitor safety alerts
@@ -228,11 +317,30 @@ class ControlStationOrchestrator(
             }
         }
         
-        // Monitor communication status
+        // Monitor protocol status
         orchestratorScope.launch {
-            communicationModule.connectionStatusFlow.collect { isConnected ->
-                if (!isConnected && _systemStatus.value == SystemStatus.OPERATIONAL) {
-                    logger.warn("Communication lost during operation")
+            when (configuration.communicationMode) {
+                CommunicationMode.UNIFIED -> {
+                    unifiedCommunicationManager.getHealthFlow().collect { health ->
+                        _protocolStatus.value = unifiedCommunicationManager.getProtocolStatus()
+                        if (health == ConnectionHealth.DISCONNECTED && _systemStatus.value == SystemStatus.OPERATIONAL) {
+                            logger.warn("All communication protocols lost during operation")
+                        }
+                    }
+                }
+                else -> {
+                    // Monitor individual protocols
+                    val protocol = when (configuration.communicationMode) {
+                        CommunicationMode.WEBSOCKET_ONLY -> webSocketModule
+                        CommunicationMode.MAVLINK_ONLY -> mavlinkModule
+                        else -> null
+                    }
+                    
+                    protocol?.getHealthFlow()?.collect { health ->
+                        if (health == ConnectionHealth.DISCONNECTED && _systemStatus.value == SystemStatus.OPERATIONAL) {
+                            logger.warn("Communication lost during operation")
+                        }
+                    }
                 }
             }
         }
@@ -338,6 +446,7 @@ class ControlStationOrchestrator(
 data class ControlStationConfig(
     val environment: Environment,
     val flightMode: FlightMode,
+    val communicationMode: CommunicationMode = CommunicationMode.UNIFIED,
     val enableAdvancedFeatures: Boolean = true,
     val logLevel: String = "INFO"
 )
@@ -346,6 +455,12 @@ enum class Environment {
     ALPINE,
     CACHYOS,
     UBUNTU
+}
+
+enum class CommunicationMode {
+    WEBSOCKET_ONLY,
+    MAVLINK_ONLY,
+    UNIFIED
 }
 
 enum class FlightMode {

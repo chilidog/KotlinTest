@@ -98,6 +98,27 @@
             <artifactId>logback-classic</artifactId>
             <version>1.4.11</version>
         </dependency>
+        
+        <!-- MAVLink Protocol Support -->
+        <dependency>
+            <groupId>io.dronefleet.mavlink</groupId>
+            <artifactId>mavlink</artifactId>
+            <version>1.1.9</version>
+        </dependency>
+        
+        <!-- Serial Communication for MAVLink -->
+        <dependency>
+            <groupId>com.fazecast</groupId>
+            <artifactId>jSerialComm</artifactId>
+            <version>2.10.4</version>
+        </dependency>
+        
+        <!-- Additional Coroutines for Flow -->
+        <dependency>
+            <groupId>org.jetbrains.kotlinx</groupId>
+            <artifactId>kotlinx-coroutines-jdk8</artifactId>
+            <version>1.7.3</version>
+        </dependency>
     </dependencies>
     
     <!-- Environment-aware profiles for different development environments -->

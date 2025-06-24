@@ -21,13 +21,16 @@ object SystemConfig {
             }
         }
     
-    // Add flight-specific configuration using your proven validation pattern
-    var flightMode: String = "SIMULATED"
+    // Add communication mode configuration with your proven validation pattern
+    var communicationMode: String = "UNIFIED"
         set(value) {
-            val supportedModes = listOf("REAL", "SIMULATED", "HYBRID")
+            val supportedModes = listOf("WEBSOCKET_ONLY", "MAVLINK_ONLY", "UNIFIED")
             if (supportedModes.any { it.equals(value, ignoreCase = true) }) {
                 field = value
             } else {
+                println("Warning: Unsupported communication mode '$value'. Supported options: ${supportedModes.joinToString(", ")}. Keeping current value: $field")
+            }
+        }
                 println("Warning: Unsupported flight mode '$value'. Supported options: ${supportedModes.joinToString(", ")}. Keeping current value: $field")
             }
         }
@@ -44,7 +47,7 @@ object SystemConfig {
     
     // Keep your proven extensible configuration
     fun getSupportedOSes(): List<String> = listOf("CachyOS", "Ubuntu", "Alpine")
-    fun getSupportedFlightModes(): List<String> = listOf("REAL", "SIMULATED", "HYBRID")
+    fun getSupportedCommunicationModes(): List<String> = listOf("WEBSOCKET_ONLY", "MAVLINK_ONLY", "UNIFIED")
     
     // Enhanced comprehensive status display using your proven pattern
     fun displayConfig() {
@@ -55,6 +58,10 @@ object SystemConfig {
         println("Flight mode: $flightMode")
         println("Real flight operations: ${isRealFlight()}")
         println("Simulated flight operations: ${isSimulatedFlight()}")
+        println("Communication mode: $communicationMode")
+        println("WebSocket only: ${communicationMode.equals("WEBSOCKET_ONLY", ignoreCase = true)}")
+        println("MAVLink only: ${communicationMode.equals("MAVLINK_ONLY", ignoreCase = true)}")
+        println("Unified protocols: ${communicationMode.equals("UNIFIED", ignoreCase = true)}")
     }
 }
 
@@ -84,6 +91,13 @@ fun main() = runBlocking {
         SystemConfig.flightMode = flightInput
     }
     
+    // Add communication mode selection
+    print("Enter communication mode (WebSocket_Only/MAVLink_Only/Unified) or press Enter for default (${SystemConfig.communicationMode}): ")
+    val commInput = readLine()?.trim()
+    if (!commInput.isNullOrEmpty()) {
+        SystemConfig.communicationMode = commInput
+    }
+    
     println("\nUpdated configuration:")
     SystemConfig.displayConfig()
     
@@ -92,24 +106,24 @@ fun main() = runBlocking {
     when {
         SystemConfig.isCachyOS() -> {
             println("Configuring Enhanced ControlStation for CachyOS:")
-            println("- High-performance WebSocket communication")
-            println("- Real-time telemetry processing")
+            println("- High-performance WebSocket + MAVLink communication")
+            println("- Real-time multi-protocol telemetry processing")
             println("- Advanced safety monitoring systems")
-            println("- Enterprise-grade flight control")
+            println("- Enterprise-grade flight control with protocol failover")
         }
         SystemConfig.isUbuntu() -> {
             println("Configuring Enhanced ControlStation for Ubuntu:")
-            println("- Production WebSocket endpoints")
-            println("- Robust error handling and reconnection")
-            println("- Enterprise safety protocols")
-            println("- Reliable mission execution")
+            println("- Production WebSocket + MAVLink endpoints")
+            println("- Robust error handling and protocol switching")
+            println("- Enterprise safety protocols with multi-protocol monitoring")
+            println("- Reliable mission execution with communication redundancy")
         }
         SystemConfig.isAlpine() -> {
             println("Configuring Enhanced ControlStation for Alpine Linux:")
-            println("- Lightweight WebSocket containers")
-            println("- Efficient concurrent telemetry")
-            println("- Minimal resource safety monitoring")
-            println("- Optimized coroutine-based operations")
+            println("- Lightweight WebSocket + MAVLink containers")
+            println("- Efficient concurrent multi-protocol telemetry")
+            println("- Minimal resource safety monitoring across protocols")
+            println("- Optimized coroutine-based hybrid operations")
         }
     }
     
@@ -128,20 +142,54 @@ fun main() = runBlocking {
         else -> FlightMode.SIMULATED
     }
     
+    val communicationMode = when {
+        SystemConfig.communicationMode.equals("WEBSOCKET_ONLY", ignoreCase = true) -> CommunicationMode.WEBSOCKET_ONLY
+        SystemConfig.communicationMode.equals("MAVLINK_ONLY", ignoreCase = true) -> CommunicationMode.MAVLINK_ONLY
+        SystemConfig.communicationMode.equals("UNIFIED", ignoreCase = true) -> CommunicationMode.UNIFIED
+        else -> CommunicationMode.UNIFIED
+    }
+    
     val config = ControlStationConfig(
         environment = environment,
         flightMode = flightMode,
+        communicationMode = communicationMode,
         enableAdvancedFeatures = true,
         logLevel = "INFO"
     )
     
-    println("\n=== Enhanced ControlStation Flight Operations ===")
-    println("🚀 Initializing WebSocket-based communication system...")
-    println("📡 WebSocket endpoint: ${when (environment) {
-        Environment.ALPINE -> "ws://localhost:8080 (container networking)"
-        Environment.CACHYOS -> "ws://controlstation.local:8080 (performance networking)"
-        Environment.UBUNTU -> "ws://production.domain:8080 (production endpoint)"
-    }}")
+    println("\n=== Enhanced ControlStation Multi-Protocol Operations ===")
+    println("🚀 Initializing hybrid communication system...")
+    println("📡 Communication mode: $communicationMode")
+    when (communicationMode) {
+        CommunicationMode.WEBSOCKET_ONLY -> {
+            println("📡 WebSocket endpoint: ${when (environment) {
+                Environment.ALPINE -> "ws://localhost:8080 (container networking)"
+                Environment.CACHYOS -> "ws://controlstation.local:8080 (performance networking)"
+                Environment.UBUNTU -> "ws://production.domain:8080 (production endpoint)"
+            }}")
+        }
+        CommunicationMode.MAVLINK_ONLY -> {
+            println("📡 MAVLink connection: ${when (environment) {
+                Environment.ALPINE -> "TCP 127.0.0.1:5760 (SITL)"
+                Environment.CACHYOS -> "Serial /dev/ttyUSB0 (hardware)"
+                Environment.UBUNTU -> "Serial /dev/ttyACM0 (hardware)"
+            }}")
+        }
+        CommunicationMode.UNIFIED -> {
+            println("📡 WebSocket + MAVLink unified communication")
+            println("   WebSocket: ${when (environment) {
+                Environment.ALPINE -> "ws://localhost:8080"
+                Environment.CACHYOS -> "ws://controlstation.local:8080"
+                Environment.UBUNTU -> "ws://production.domain:8080"
+            }}")
+            println("   MAVLink: ${when (environment) {
+                Environment.ALPINE -> "TCP 127.0.0.1:5760"
+                Environment.CACHYOS -> "Serial /dev/ttyUSB0"
+                Environment.UBUNTU -> "Serial /dev/ttyACM0"
+            }}")
+            println("   Protocol adapter: Enabled for seamless translation")
+        }
+    }
     
     // Initialize the enhanced orchestrator
     val orchestrator = ControlStationOrchestrator(config)
