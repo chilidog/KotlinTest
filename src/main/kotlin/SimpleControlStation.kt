@@ -7,7 +7,13 @@ import org.slf4j.LoggerFactory
 // Core enums and data classes
 enum class Environment { ALPINE, CACHYOS, UBUNTU }
 enum class FlightMode { REAL, SIMULATED, HYBRID }
-enum class CommunicationMode { WEBSOCKET_ONLY, MAVLINK_ONLY, UNIFIED }
+enum class CommunicationMode { 
+    WEBSOCKET_ONLY, 
+    MAVLINK_ONLY, 
+    UNIFIED,
+    VIDEO_ONLY,        // NEW: WiFiLink 2 video streaming only
+    TRIPLE_PROTOCOL    // NEW: WebSocket + MAVLink + Video
+}
 enum class MissionType { BASIC_FLIGHT, AUTONOMOUS_PATROL, EMERGENCY_RESPONSE }
 
 data class ControlStationConfig(
@@ -45,7 +51,7 @@ object SystemConfig {
     // Add communication mode configuration with your proven validation pattern
     var communicationMode: String = "UNIFIED"
         set(value) {
-            val supportedModes = listOf("WEBSOCKET_ONLY", "MAVLINK_ONLY", "UNIFIED")
+            val supportedModes = listOf("WEBSOCKET_ONLY", "MAVLINK_ONLY", "UNIFIED", "VIDEO_ONLY", "TRIPLE_PROTOCOL")
             if (supportedModes.any { it.equals(value, ignoreCase = true) }) {
                 field = value
             } else {
@@ -80,6 +86,8 @@ object SystemConfig {
         println("WebSocket only: ${communicationMode.equals("WEBSOCKET_ONLY", ignoreCase = true)}")
         println("MAVLink only: ${communicationMode.equals("MAVLINK_ONLY", ignoreCase = true)}")
         println("Unified protocols: ${communicationMode.equals("UNIFIED", ignoreCase = true)}")
+        println("Video only: ${communicationMode.equals("VIDEO_ONLY", ignoreCase = true)}")
+        println("Triple protocol: ${communicationMode.equals("TRIPLE_PROTOCOL", ignoreCase = true)}")
     }
 }
 
@@ -106,6 +114,21 @@ class MockCommunicationSystem(private val mode: CommunicationMode) {
                 println("   Protocol adapter: Enabled for seamless translation")
                 println("   Automatic failover: Ready")
             }
+            CommunicationMode.VIDEO_ONLY -> {
+                println("✅ WiFiLink 2 video streaming initialized")
+                println("📡 Video UDP port: 5600 (H.264 stream)")
+                println("📡 Telemetry UDP port: 5601 (FPV data)")
+                println("   H.264 decoder: Ready")
+                println("   Frame buffering: 30 FPS")
+            }
+            CommunicationMode.TRIPLE_PROTOCOL -> {
+                println("✅ Triple protocol system initialized")
+                println("📡 WebSocket + MAVLink + WiFiLink 2 active")
+                println("   Protocol bridging: All three protocols")
+                println("   Video integration: Real-time H.264 streaming")
+                println("   Unified telemetry: Mission + Video data")
+                println("   Automatic failover: Enhanced safety")
+            }
         }
     }
     
@@ -126,6 +149,35 @@ class MockCommunicationSystem(private val mode: CommunicationMode) {
             CommunicationMode.UNIFIED -> {
                 repeat(10) {
                     println("📊 Unified telemetry: Protocol bridging active, ${listOf("WebSocket", "MAVLink").random()} primary")
+                    delay(1000)
+                }
+            }
+            CommunicationMode.VIDEO_ONLY -> {
+                repeat(10) {
+                    val frameRate = (25..30).random()
+                    val latency = (20..45).random()
+                    val quality = listOf("1080p", "720p", "480p").random()
+                    val bitRate = (2000..8000).random()
+                    println("📹 Video Frame: ${quality} @ ${frameRate}fps, Latency: ${latency}ms, BitRate: ${bitRate}kbps")
+                    println("📊 FPV Telemetry: Signal: ${(70..95).random()}%, Quality: ${quality}")
+                    delay(1000)
+                }
+            }
+            CommunicationMode.TRIPLE_PROTOCOL -> {
+                repeat(10) {
+                    val alt = (50..200).random()
+                    val speed = (0..25).random()
+                    val gps = (8..12).random()
+                    val battery = (70..95).random()
+                    val frameRate = (25..30).random()
+                    val latency = (20..45).random()
+                    val quality = listOf("1080p", "720p").random()
+                    
+                    println("🚁 Triple Protocol Telemetry:")
+                    println("   📡 WebSocket: Alt: ${alt}m, Speed: ${speed}m/s")
+                    println("   📡 MAVLink: GPS: ${gps} sats, Battery: ${battery}%")
+                    println("   📹 Video: ${quality} @ ${frameRate}fps, Latency: ${latency}ms")
+                    println("   🔄 Unified: All protocols synchronized")
                     delay(1000)
                 }
             }
@@ -157,7 +209,7 @@ fun main() = runBlocking {
         SystemConfig.flightMode = flightInput
     }
     
-    print("Enter communication mode (WebSocket_Only/MAVLink_Only/Unified) or press Enter for default (${SystemConfig.communicationMode}): ")
+    print("Enter communication mode (WebSocket_Only/MAVLink_Only/Unified/Video_Only/Triple_Protocol) or press Enter for default (${SystemConfig.communicationMode}): ")
     val commInput = readLine()?.trim()
     if (!commInput.isNullOrEmpty()) {
         SystemConfig.communicationMode = commInput
@@ -185,6 +237,8 @@ fun main() = runBlocking {
         SystemConfig.communicationMode.equals("WEBSOCKET_ONLY", ignoreCase = true) -> CommunicationMode.WEBSOCKET_ONLY
         SystemConfig.communicationMode.equals("MAVLINK_ONLY", ignoreCase = true) -> CommunicationMode.MAVLINK_ONLY
         SystemConfig.communicationMode.equals("UNIFIED", ignoreCase = true) -> CommunicationMode.UNIFIED
+        SystemConfig.communicationMode.equals("VIDEO_ONLY", ignoreCase = true) -> CommunicationMode.VIDEO_ONLY
+        SystemConfig.communicationMode.equals("TRIPLE_PROTOCOL", ignoreCase = true) -> CommunicationMode.TRIPLE_PROTOCOL
         else -> CommunicationMode.UNIFIED
     }
     
@@ -199,6 +253,20 @@ fun main() = runBlocking {
     println("\n=== Enhanced ControlStation Multi-Protocol Operations ===")
     println("🚀 Initializing hybrid communication system...")
     println("📡 Communication mode: $communicationMode")
+    
+    // Initialize video components for video-enabled modes
+    val wifiLink2Adapter = if (communicationMode == CommunicationMode.VIDEO_ONLY || 
+                              communicationMode == CommunicationMode.TRIPLE_PROTOCOL) {
+        com.controlstation.video.WiFiLink2Adapter().also {
+            println("📹 WiFiLink 2 adapter initialized for video streaming")
+        }
+    } else null
+    
+    val enhancedManager = if (communicationMode == CommunicationMode.TRIPLE_PROTOCOL) {
+        com.controlstation.communication.EnhancedUnifiedCommunicationManager(wifiLink2Adapter!!).also {
+            println("🔧 Enhanced Unified Communication Manager initialized")
+        }
+    } else null
     
     // Initialize mock communication system
     val commSystem = MockCommunicationSystem(communicationMode)
@@ -232,13 +300,34 @@ fun main() = runBlocking {
     println("\n🏆 Enhanced ControlStation Demo Complete!")
     println("✅ Your SystemConfig foundation successfully powers:")
     println("✅ Multi-Protocol Communication (WebSocket + MAVLink)")
+    println("✅ WiFiLink 2 Video Streaming Integration")
+    println("✅ Triple Protocol Support (WebSocket + MAVLink + Video)")
     println("✅ Real-time Telemetry Streaming")
+    println("✅ H.264 Video Processing")
     println("✅ Advanced Safety Monitoring")
     println("✅ Coroutine-based Concurrent Operations")
     println("✅ Environment-aware Optimization")
     println("✅ Enterprise-grade Mission Control")
     println("✅ Protocol Adapter Pattern")
     println("✅ Automatic Failover Support")
+    println("✅ Cross-Platform Video Support")
+    
+    when (communicationMode) {
+        CommunicationMode.VIDEO_ONLY -> {
+            println("\n🎯 VIDEO_ONLY Mode Demonstration Complete!")
+            println("📹 WiFiLink 2 video streaming operational")
+            println("📊 FPV telemetry integrated")
+        }
+        CommunicationMode.TRIPLE_PROTOCOL -> {
+            println("\n🎯 TRIPLE_PROTOCOL Mode Demonstration Complete!")
+            println("🚁 All three protocols working in harmony")
+            println("📡 WebSocket + MAVLink + WiFiLink 2 unified")
+            println("🔄 Real-time protocol bridging achieved")
+        }
+        else -> {
+            println("\n🎯 Standard protocol demonstration complete")
+        }
+    }
     
     println("\n👋 Enhanced ControlStation demo complete!")
 }
