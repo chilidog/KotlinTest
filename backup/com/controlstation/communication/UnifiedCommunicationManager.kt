@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicReference
  */
 class UnifiedCommunicationManager(
     private val webSocketProtocol: WebSocketCommunicationModule,
-    private val mavlinkProtocol: MAVLinkCommunicationModule? = null,
+    private val mavlinkProtocol: MockMAVLinkModule? = null,
     private val protocolAdapter: ProtocolAdapter
 ) : CommunicationProtocol {
     

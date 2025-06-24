@@ -25,7 +25,7 @@ class ControlStationOrchestrator(
     
     // Enhanced communication subsystems
     private lateinit var webSocketModule: WebSocketCommunicationModule
-    private lateinit var mavlinkModule: MAVLinkCommunicationModule
+    private lateinit var mavlinkModule: MockMAVLinkModule
     private lateinit var protocolAdapter: ProtocolAdapter
     private lateinit var unifiedCommunicationManager: UnifiedCommunicationManager
     
@@ -198,7 +198,7 @@ class ControlStationOrchestrator(
             componentId = 190
         )
         
-        mavlinkModule = MAVLinkCommunicationModule(mavlinkConfig)
+        mavlinkModule = MockMAVLinkModule()
         
         // Initialize protocol adapter
         protocolAdapter = ProtocolAdapter(
@@ -304,6 +304,8 @@ class ControlStationOrchestrator(
             Environment.UBUNTU -> "/dev/ttyACM0"
         }
         
+        return "WebSocket: $wsUrl, MAVLink: $mavlinkConnection"
+    }
     
     private fun setupSystemMonitoring() {
         // Monitor safety alerts
@@ -467,6 +469,7 @@ enum class FlightMode {
     REAL,
     SIMULATED,
     HYBRID
+    }
 }
 
 enum class SystemStatus {

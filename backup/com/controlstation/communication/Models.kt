@@ -5,6 +5,50 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 
 /**
+ * Enum definitions for the ControlStation system
+ */
+enum class Environment {
+    ALPINE, CACHYOS, UBUNTU
+}
+
+enum class FlightMode {
+    REAL, SIMULATED, HYBRID
+}
+
+enum class CommunicationMode {
+    WEBSOCKET_ONLY, MAVLINK_ONLY, UNIFIED
+}
+
+enum class MissionType {
+    BASIC_FLIGHT, AUTONOMOUS_PATROL, EMERGENCY_RESPONSE
+}
+
+enum class CommandType {
+    ARM, DISARM, TAKEOFF, LAND, MOVE_TO, SET_MODE, EMERGENCY_STOP
+}
+
+enum class ConnectionStatus {
+    CONNECTED, DISCONNECTED, DEGRADED
+}
+
+/**
+ * Configuration classes
+ */
+data class ControlStationConfig(
+    val environment: Environment,
+    val flightMode: FlightMode,
+    val communicationMode: CommunicationMode,
+    val enableAdvancedFeatures: Boolean = true,
+    val logLevel: String = "INFO"
+)
+
+/**
+ * Command and Telemetry classes (using both naming conventions for compatibility)
+ */
+typealias Command = DroneCommand
+typealias Telemetry = TelemetryData
+
+/**
  * Data models for drone communication
  */
 data class TelemetryData(
@@ -50,6 +94,7 @@ data class DroneCommand(
     @JsonProperty("id") val id: String,
     @JsonProperty("timestamp") val timestamp: Long = System.currentTimeMillis(),
     @JsonProperty("command") val command: String,
+    @JsonProperty("type") val type: CommandType,
     @JsonProperty("parameters") val parameters: Map<String, Any> = emptyMap(),
     @JsonProperty("priority") val priority: CommandPriority = CommandPriority.NORMAL
 )

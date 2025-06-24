@@ -32,7 +32,7 @@
         <kotlin-test.version>1.9.10</kotlin-test.version>
         
         <!-- Main class for execution -->
-        <main.class>ControlStationKt</main.class>
+        <main.class>SimpleControlStationKt</main.class>
         
         <!-- Universal path properties - will be overridden by profiles -->
         <source.directory>src/main/kotlin</source.directory>
@@ -263,7 +263,7 @@
                 <artifactId>exec-maven-plugin</artifactId>
                 <version>${exec-maven-plugin.version}</version>
                 <configuration>
-                    <mainClass>ControlStationKt</mainClass> <!-- Changed from MainKt to ControlStationKt -->
+                    <mainClass>SimpleControlStationKt</mainClass>
                 </configuration>
             </plugin>
         </plugins>

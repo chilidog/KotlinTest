@@ -21,7 +21,7 @@ class WebSocketCommunicationModule(
     private val maxReconnectAttempts: Int = 10,
     private val heartbeatIntervalMs: Long = 30000,
     private val telemetryIntervalMs: Long = 1000
-) {
+) : CommunicationProtocol {
     private val logger = LoggerFactory.getLogger(WebSocketCommunicationModule::class.java)
     
     private val okHttpClient = OkHttpClient.Builder()
@@ -429,5 +429,51 @@ class SimulatedTelemetryGenerator {
         } else {
             altitude = 0.0
         }
+    }
+
+    // CommunicationProtocol interface implementation
+    override suspend fun connect(connectionString: String) {
+        // Use the provided connection string, otherwise fall back to baseUrl
+        val actualUrl = if (connectionString.isNotEmpty()) connectionString else baseUrl
+        logger.info("Connecting to WebSocket at: $actualUrl")
+        connectWithRetry()
+    }
+
+    override suspend fun sendCommand(command: Command) {
+        sendCommand(command as DroneCommand)
+    }
+
+    override fun getTelemetryFlow(): Flow<Telemetry> {
+        return flow {
+            while (isRunning.get()) {
+                emit(generateTelemetry())
+                delay(telemetryIntervalMs)
+            }
+        }.flowOn(Dispatchers.IO)
+    }
+
+    override fun getHealthFlow(): Flow<ConnectionHealth> {
+        return flow {
+            while (isRunning.get()) {
+                emit(getConnectionHealth())
+                delay(5000) // Emit health every 5 seconds
+            }
+        }.flowOn(Dispatchers.IO)
+    }
+
+    override fun isConnected(): Boolean {
+        return webSocket.get()?.let { true } ?: false
+    }
+
+    override suspend fun disconnect() {
+        stop()
+    }
+
+    override fun getProtocolType(): ProtocolType {
+        return ProtocolType.WEBSOCKET
+    }
+
+    override fun getConnectionInfo(): String {
+        return "WebSocket connection to $baseUrl"
     }
 }

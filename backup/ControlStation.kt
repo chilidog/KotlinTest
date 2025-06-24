@@ -21,6 +21,17 @@ object SystemConfig {
             }
         }
     
+    // Add flight mode configuration with your proven validation pattern
+    var flightMode: String = "SIMULATED"
+        set(value) {
+            val supportedModes = listOf("REAL", "SIMULATED", "HYBRID")
+            if (supportedModes.any { it.equals(value, ignoreCase = true) }) {
+                field = value
+            } else {
+                println("Warning: Unsupported flight mode '$value'. Supported options: ${supportedModes.joinToString(", ")}. Keeping current value: $field")
+            }
+        }
+    
     // Add communication mode configuration with your proven validation pattern
     var communicationMode: String = "UNIFIED"
         set(value) {
@@ -29,9 +40,6 @@ object SystemConfig {
                 field = value
             } else {
                 println("Warning: Unsupported communication mode '$value'. Supported options: ${supportedModes.joinToString(", ")}. Keeping current value: $field")
-            }
-        }
-                println("Warning: Unsupported flight mode '$value'. Supported options: ${supportedModes.joinToString(", ")}. Keeping current value: $field")
             }
         }
     

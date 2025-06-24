@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean
  */
 class ProtocolAdapter(
     private val webSocketProtocol: WebSocketCommunicationModule? = null,
-    private val mavlinkProtocol: MAVLinkCommunicationModule? = null
+    private val mavlinkProtocol: MockMAVLinkModule? = null
 ) {
     
     private val logger = LoggerFactory.getLogger(ProtocolAdapter::class.java)
