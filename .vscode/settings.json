@@ -12,5 +12,13 @@
         "gradlew": true,
         "gradlew.bat": true,
         "build.gradle*": true
+    },
+    "chat.mcp.serverSampling": {
+        "KotlinTest/.vscode/mcp.json: parrot-arsdk": {
+            "allowedModels": [
+                "github.copilot-chat/gpt-4.1",
+                "github.copilot-chat/claude-sonnet-4"
+            ]
+        }
     }
 }

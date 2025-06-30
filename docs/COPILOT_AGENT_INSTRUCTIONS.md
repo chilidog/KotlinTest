@@ -1,18 +1,22 @@
 # 🚁 ControlStation WiFiLink 2 Integration - Complete Agent Instructions
 
 ## 🎯 Mission Context
-You are implementing WiFiLink 2 video streaming integration with an existing, working ControlStation that has hybrid WebSocket+MAVLink communication. The system is production-ready and operational.
+
+You are implementing WiFiLink 2 video streaming integration with an existing, working ControlStation that has
+hybrid WebSocket+MAVLink communication. The system is production-ready and operational.
 
 ## 📊 Current System Analysis (Confirmed Working)
 
 ### Architecture Foundation
+
 - **Protocol Adapter Pattern**: Proven with WebSocket ↔ MAVLink translation
 - **Coroutine-Based Concurrency**: Real-time telemetry streaming operational
 - **Cross-Platform Profiles**: WSL (CachyOS), Unix, Windows, Codespaces
 - **Enterprise Dependencies**: MAVLink, OkHttp, Jackson, Logback integrated
 
 ### Verified Components
-```
+
+```text
 pom.xml: Enhanced with MAVLink dependencies ✅
 ├── io.dronefleet.mavlink:1.1.9 (industry-standard protocol)
 ├── com.fazecast.jSerialComm:2.10.4 (hardware communication)
@@ -31,6 +35,7 @@ SimpleControlStation.kt: Working demo ✅
 ## 🚀 WiFiLink 2 Integration Implementation
 
 ### Phase 1: Enhanced Dependencies
+
 Add these video dependencies to existing pom.xml (preserve current structure):
 
 ```xml
@@ -66,6 +71,7 @@ Add these video dependencies to existing pom.xml (preserve current structure):
 ```
 
 ### Phase 2: WiFiLink2Adapter Implementation
+
 Create: `src/main/kotlin/com/controlstation/video/WiFiLink2Adapter.kt`
 
 ```kotlin
@@ -110,6 +116,7 @@ class WiFiLink2Adapter(
 ```
 
 ### Phase 3: UnifiedCommunicationManager Enhancement
+
 Modify existing UnifiedCommunicationManager to add video as third protocol:
 
 ```kotlin
@@ -154,6 +161,7 @@ class UnifiedCommunicationManager(
 ```
 
 ### Phase 4: SimpleControlStation.kt Enhancement
+
 Update existing demo to include video options:
 
 ```kotlin
@@ -182,12 +190,14 @@ private fun configureCommunicationMode(): CommunicationMode {
 ## 🎯 Integration Requirements
 
 ### Preserve Existing Functionality
+
 - **CRITICAL**: All existing WebSocket+MAVLink functionality must remain operational
 - **Protocol Adapter**: Video integration follows same patterns as WebSocket/MAVLink
 - **Cross-Platform**: Video must work on WSL:CachyOS, Codespaces, Windows, Unix
 - **Performance**: Maintain real-time telemetry while adding video processing
 
 ### Video-Specific Requirements
+
 - **UDP Reception**: WiFiLink 2 video streams on port 5600 (default)
 - **H.264 Decoding**: Real-time video frame processing
 - **Frame Buffering**: Circular buffer for smooth playback (30 FPS target)
@@ -195,6 +205,7 @@ private fun configureCommunicationMode(): CommunicationMode {
 - **Error Handling**: Graceful degradation if video unavailable
 
 ### Testing Validation
+
 1. **Compile**: `mvn clean compile` (must succeed)
 2. **Run Demo**: `mvn exec:java` (video options appear)
 3. **Existing Functions**: WebSocket+MAVLink modes still work
@@ -204,6 +215,7 @@ private fun configureCommunicationMode(): CommunicationMode {
 ## 🏆 Expected Results
 
 ### Enhanced System Capabilities
+
 - **Triple Protocol Support**: WebSocket + MAVLink + WiFiLink 2 video
 - **Unified Telemetry**: Mission data + real-time video streams
 - **Protocol Bridging**: Seamless translation between all three protocols
@@ -211,6 +223,7 @@ private fun configureCommunicationMode(): CommunicationMode {
 - **Cross-Platform Video**: Universal deployment with video support
 
 ### Demo Enhancement
+
 - **Interactive Video Config**: User selects video streaming options
 - **Real-Time Display**: Video frame processing demonstration
 - **Telemetry Overlay**: Mission data synchronized with video
@@ -218,6 +231,7 @@ private fun configureCommunicationMode(): CommunicationMode {
 - **Multi-Stream Ready**: Foundation for fleet video management
 
 ## 📊 Success Criteria Checklist
+
 - [ ] Enhanced pom.xml with video dependencies
 - [ ] WiFiLink2Adapter implemented and integrated
 - [ ] UnifiedCommunicationManager enhanced with video

@@ -19,7 +19,7 @@
 
 ### Combined System Vision
 
-**ControlStation + WiFiLink 2 = Ultimate Drone Control Platform**
+## ControlStation + WiFiLink 2 = Ultimate Drone Control Platform
 
 - Mission control + real-time video
 - Enterprise operations + FPV capabilities  
@@ -30,7 +30,7 @@
 
 ### Protocol Stack Integration
 
-```
+```text
 Application Layer:
 ├── ControlStation Mission Control (existing)
 ├── WebSocket JSON Communication (existing) 
@@ -55,7 +55,7 @@ Physical Layer:
 
 ### Data Flow Architecture
 
-```
+```text
 Drone → WiFiLink 2 Hardware → UDP H.264 Stream → ControlStation Video Adapter
      ↘ Autopilot → MAVLink → ControlStation Protocol Adapter
        ↘ Telemetry → WebSocket → ControlStation Communication Manager
@@ -200,4 +200,6 @@ Drone → WiFiLink 2 Hardware → UDP H.264 Stream → ControlStation Video Adap
 - **Hardware Integration**: Generic approach for future video systems
 - **Analytics Foundation**: Preparation for AI/ML video enhancement
 
-This integration plan provides the complete roadmap for creating the world's most comprehensive drone control platform by combining ControlStation's enterprise mission control with WiFiLink 2's advanced video streaming capabilities.
+This integration plan provides the complete roadmap for creating the world's most comprehensive drone control
+platform by combining ControlStation's enterprise mission control with WiFiLink 2's advanced video streaming
+capabilities.

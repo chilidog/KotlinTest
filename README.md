@@ -1,6 +1,8 @@
 # KotlinTest
 
-A Kotlin project workspace for testing and development with proper project structure, Maven build configuration, testing framework, and OS-specific configuration support.
+A Kotlin project workspace for testing and development with proper project
+structure, Maven build configuration, testing framework, and OS-specific
+configuration support.
 
 ## Project Structure
 
@@ -154,4 +156,3 @@ This project demonstrates several testing best practices:
 ## License
 
 This project is for educational and testing purposes.
-

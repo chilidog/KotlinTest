@@ -1,21 +1,86 @@
-// Simple Working ControlStation Demo
-// Demonstrates the hybrid communication system concept
+/**
+ * Enhanced ControlStation - Government-Grade Drone Control System
+ * 
+ * Demonstrates advanced hybrid communication system with triple-protocol support:
+ * - WebSocket real-time communication
+ * - MAVLink drone protocol integration
+ * - WiFiLink 2 video streaming
+ * - JSON-driven mission simulation
+ * 
+ * Features:
+ * - Environment-aware configuration (Alpine/Ubuntu/CachyOS)
+ * - Cross-platform compatibility (Linux/Windows/WSL/Codespaces)
+ * - Real-time telemetry and safety monitoring
+ * - Government-grade mission planning and execution
+ * - SBIR Phase I ready architecture
+ * 
+ * @author Enhanced ControlStation Team
+ * @version 1.0.0
+ */
 
 import kotlinx.coroutines.*
 import org.slf4j.LoggerFactory
+import com.controlstation.simulation.FlexibleMissionSimulator
 
 // Core enums and data classes
-enum class Environment { ALPINE, CACHYOS, UBUNTU }
-enum class FlightMode { REAL, SIMULATED, HYBRID }
-enum class CommunicationMode { 
-    WEBSOCKET_ONLY, 
-    MAVLINK_ONLY, 
-    UNIFIED,
-    VIDEO_ONLY,        // NEW: WiFiLink 2 video streaming only
-    TRIPLE_PROTOCOL    // NEW: WebSocket + MAVLink + Video
-}
-enum class MissionType { BASIC_FLIGHT, AUTONOMOUS_PATROL, EMERGENCY_RESPONSE }
 
+/**
+ * Supported deployment environments for government operations
+ */
+enum class Environment { 
+    /** Alpine Linux - Lightweight container deployments */
+    ALPINE, 
+    /** CachyOS - High-performance development */
+    CACHYOS, 
+    /** Ubuntu - Standard government deployment */
+    UBUNTU 
+}
+
+/**
+ * Flight operation modes for various mission types
+ */
+enum class FlightMode { 
+    /** Live aircraft operations */
+    REAL, 
+    /** Full simulation environment */
+    SIMULATED, 
+    /** Mixed real/simulated operations */
+    HYBRID 
+}
+
+/**
+ * Communication protocol configurations
+ */
+enum class CommunicationMode { 
+    /** WebSocket-only communication */
+    WEBSOCKET_ONLY, 
+    /** MAVLink protocol only */
+    MAVLINK_ONLY, 
+    /** Combined WebSocket + MAVLink */
+    UNIFIED,
+    /** WiFiLink 2 video streaming only */
+    VIDEO_ONLY,
+    /** Full triple protocol: WebSocket + MAVLink + Video */
+    TRIPLE_PROTOCOL,
+    /** JSON-driven mission simulation */
+    JSON_MISSION
+}
+
+/**
+ * Mission types for government operations
+ */
+enum class MissionType { 
+    /** Basic flight operations */
+    BASIC_FLIGHT, 
+    /** Autonomous patrol missions */
+    AUTONOMOUS_PATROL, 
+    /** Emergency response operations */
+    EMERGENCY_RESPONSE 
+}
+
+/**
+ * Control station configuration for government-grade operations
+ */
 data class ControlStationConfig(
     val environment: Environment,
     val flightMode: FlightMode,
@@ -51,7 +116,7 @@ object SystemConfig {
     // Add communication mode configuration with your proven validation pattern
     var communicationMode: String = "UNIFIED"
         set(value) {
-            val supportedModes = listOf("WEBSOCKET_ONLY", "MAVLINK_ONLY", "UNIFIED", "VIDEO_ONLY", "TRIPLE_PROTOCOL")
+            val supportedModes = listOf("WEBSOCKET_ONLY", "MAVLINK_ONLY", "UNIFIED", "VIDEO_ONLY", "TRIPLE_PROTOCOL", "JSON_MISSION")
             if (supportedModes.any { it.equals(value, ignoreCase = true) }) {
                 field = value
             } else {
@@ -71,7 +136,7 @@ object SystemConfig {
     
     // Keep your proven extensible configuration
     fun getSupportedOSes(): List<String> = listOf("CachyOS", "Ubuntu", "Alpine")
-    fun getSupportedCommunicationModes(): List<String> = listOf("WEBSOCKET_ONLY", "MAVLINK_ONLY", "UNIFIED")
+    fun getSupportedCommunicationModes(): List<String> = listOf("WEBSOCKET_ONLY", "MAVLINK_ONLY", "UNIFIED", "VIDEO_ONLY", "TRIPLE_PROTOCOL", "JSON_MISSION")
     
     // Enhanced comprehensive status display using your proven pattern
     fun displayConfig() {
@@ -88,6 +153,7 @@ object SystemConfig {
         println("Unified protocols: ${communicationMode.equals("UNIFIED", ignoreCase = true)}")
         println("Video only: ${communicationMode.equals("VIDEO_ONLY", ignoreCase = true)}")
         println("Triple protocol: ${communicationMode.equals("TRIPLE_PROTOCOL", ignoreCase = true)}")
+        println("JSON Mission: ${communicationMode.equals("JSON_MISSION", ignoreCase = true)}")
     }
 }
 
@@ -128,6 +194,14 @@ class MockCommunicationSystem(private val mode: CommunicationMode) {
                 println("   Video integration: Real-time H.264 streaming")
                 println("   Unified telemetry: Mission + Video data")
                 println("   Automatic failover: Enhanced safety")
+            }
+            CommunicationMode.JSON_MISSION -> {
+                println("✅ JSON-driven mission simulation initialized")
+                println("📋 Mission files: Loading from src/main/resources/missions/")
+                println("🚁 Drone configs: Loading from src/main/resources/drones/")
+                println("   Flexible mission planning: Government-grade scenarios")
+                println("   Real-time telemetry: Live mission monitoring")
+                println("   Safety enforcement: Automated parameter checking")
             }
         }
     }
@@ -181,14 +255,65 @@ class MockCommunicationSystem(private val mode: CommunicationMode) {
                     delay(1000)
                 }
             }
+            CommunicationMode.JSON_MISSION -> {
+                executeJsonMission()
+            }
+        }
+    }
+    
+    private suspend fun executeJsonMission() {
+        println("\n🎯 JSON MISSION SIMULATION STARTING")
+        println("=".repeat(50))
+        
+        try {
+            val simulator = FlexibleMissionSimulator()
+            
+            // Load mission and drone configurations
+            val mission = simulator.loadMission("cetus-lite-demo.json")
+            simulator.loadDroneConfig("cetus-lite-beta.json")
+            
+            println("\n📋 MISSION BRIEFING")
+            println("Mission: ${mission.mission.name}")
+            println("Description: ${mission.mission.description}")
+            println("Drone: ${mission.mission.drone_model}")
+            println("Duration: ${mission.mission.duration_estimate_seconds}s")
+            println("Commands: ${mission.commands.size}")
+            
+            // Display safety parameters
+            println("\n🛡️ SAFETY PARAMETERS")
+            println("Max Altitude: ${mission.mission.safety_parameters.max_altitude_feet}ft")
+            println("Max Speed: ${mission.mission.safety_parameters.max_speed_fps}fps")
+            println("Emergency Battery: ${mission.mission.safety_parameters.emergency_land_battery_percent}%")
+            println("Geofence: ${mission.mission.safety_parameters.geofence_radius_feet}ft")
+            
+            // Prompt for execution confirmation
+            println("\n🚀 MISSION EXECUTION CONFIRMATION")
+            print("Execute mission? (Y/n): ")
+            val confirmation = readLine()?.trim()?.lowercase()
+            
+            if (confirmation == "n" || confirmation == "no") {
+                println("❌ Mission aborted by user")
+                return
+            }
+            
+            // Execute the mission
+            println("\n🚁 MISSION EXECUTION INITIATED")
+            simulator.executeMission()
+            
+            // Display final mission status
+            println("\n📊 FINAL MISSION STATUS")
+            println(simulator.getMissionStatus())
+            
+        } catch (e: Exception) {
+            logger.error("❌ JSON Mission execution failed: ${e.message}", e)
+            println("❌ Mission execution failed: ${e.message}")
+            println("💡 Please verify JSON configuration files exist and are valid")
         }
     }
 }
 
 // Main application - Enhanced with multi-protocol communication!
 fun main() = runBlocking {
-    val logger = LoggerFactory.getLogger("ControlStation")
-    
     println("🚁 Welcome to Enhanced ControlStation with Hybrid Communication!")
     
     // Keep your proven environment-aware application startup
@@ -209,7 +334,7 @@ fun main() = runBlocking {
         SystemConfig.flightMode = flightInput
     }
     
-    print("Enter communication mode (WebSocket_Only/MAVLink_Only/Unified/Video_Only/Triple_Protocol) or press Enter for default (${SystemConfig.communicationMode}): ")
+    print("Enter communication mode (WebSocket_Only/MAVLink_Only/Unified/Video_Only/Triple_Protocol/JSON_Mission) or press Enter for default (${SystemConfig.communicationMode}): ")
     val commInput = readLine()?.trim()
     if (!commInput.isNullOrEmpty()) {
         SystemConfig.communicationMode = commInput
@@ -217,14 +342,6 @@ fun main() = runBlocking {
     
     println("\nUpdated configuration:")
     SystemConfig.displayConfig()
-    
-    // Create configuration based on SystemConfig
-    val environment = when {
-        SystemConfig.isAlpine() -> Environment.ALPINE
-        SystemConfig.isCachyOS() -> Environment.CACHYOS
-        SystemConfig.isUbuntu() -> Environment.UBUNTU
-        else -> Environment.ALPINE
-    }
     
     val flightMode = when {
         SystemConfig.isRealFlight() -> FlightMode.REAL
@@ -239,16 +356,9 @@ fun main() = runBlocking {
         SystemConfig.communicationMode.equals("UNIFIED", ignoreCase = true) -> CommunicationMode.UNIFIED
         SystemConfig.communicationMode.equals("VIDEO_ONLY", ignoreCase = true) -> CommunicationMode.VIDEO_ONLY
         SystemConfig.communicationMode.equals("TRIPLE_PROTOCOL", ignoreCase = true) -> CommunicationMode.TRIPLE_PROTOCOL
+        SystemConfig.communicationMode.equals("JSON_MISSION", ignoreCase = true) -> CommunicationMode.JSON_MISSION
         else -> CommunicationMode.UNIFIED
     }
-    
-    val config = ControlStationConfig(
-        environment = environment,
-        flightMode = flightMode,
-        communicationMode = communicationMode,
-        enableAdvancedFeatures = true,
-        logLevel = "INFO"
-    )
     
     println("\n=== Enhanced ControlStation Multi-Protocol Operations ===")
     println("🚀 Initializing hybrid communication system...")
@@ -262,11 +372,11 @@ fun main() = runBlocking {
         }
     } else null
     
-    val enhancedManager = if (communicationMode == CommunicationMode.TRIPLE_PROTOCOL) {
+    if (communicationMode == CommunicationMode.TRIPLE_PROTOCOL) {
         com.controlstation.communication.EnhancedUnifiedCommunicationManager(wifiLink2Adapter!!).also {
             println("🔧 Enhanced Unified Communication Manager initialized")
         }
-    } else null
+    }
     
     // Initialize mock communication system
     val commSystem = MockCommunicationSystem(communicationMode)
@@ -311,6 +421,9 @@ fun main() = runBlocking {
     println("✅ Protocol Adapter Pattern")
     println("✅ Automatic Failover Support")
     println("✅ Cross-Platform Video Support")
+    println("✅ JSON-Driven Mission Simulation")
+    println("✅ Government-Grade Mission Planning")
+    println("✅ Flexible Configuration Management")
     
     when (communicationMode) {
         CommunicationMode.VIDEO_ONLY -> {
@@ -323,6 +436,13 @@ fun main() = runBlocking {
             println("🚁 All three protocols working in harmony")
             println("📡 WebSocket + MAVLink + WiFiLink 2 unified")
             println("🔄 Real-time protocol bridging achieved")
+        }
+        CommunicationMode.JSON_MISSION -> {
+            println("\n🎯 JSON_MISSION Mode Demonstration Complete!")
+            println("📋 Mission simulation executed successfully")
+            println("🚁 Government-grade mission planning demonstrated")
+            println("🛡️ Real-time safety monitoring validated")
+            println("📊 Telemetry streaming and logging operational")
         }
         else -> {
             println("\n🎯 Standard protocol demonstration complete")

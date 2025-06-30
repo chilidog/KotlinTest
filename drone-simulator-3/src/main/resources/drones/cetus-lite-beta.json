@@ -1,0 +1,28 @@
+{
+  "drone": {
+    "model": "Cetus Lite Beta FPV",
+    "maxAltitude": 100,
+    "weight": 0.5,
+    "batteryCapacity": 1500,
+    "flightTime": 20,
+    "commands": [
+      {
+        "type": "climb",
+        "altitude": 6,
+        "duration": 5
+      },
+      {
+        "type": "pause",
+        "duration": 5
+      },
+      {
+        "type": "circle",
+        "radius": 6,
+        "duration": 10
+      },
+      {
+        "type": "land"
+      }
+    ]
+  }
+}

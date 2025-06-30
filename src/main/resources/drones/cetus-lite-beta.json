@@ -1,0 +1,102 @@
+{
+  "drone": {
+    "model": "Cetus Lite Beta FPV",
+    "manufacturer": "BetaFPV",
+    "type": "Racing/Acro FPV Micro Drone",
+    "category": "Indoor/Outdoor Micro FPV",
+    "specifications": {
+      "weight_grams": 31.5,
+      "dimensions_mm": {
+        "length": 78,
+        "width": 78,
+        "height": 35
+      },
+      "flight_time_minutes": 4,
+      "max_speed_mph": 25,
+      "max_altitude_feet": 400,
+      "operating_frequency": "2.4GHz",
+      "video_transmission": "5.8GHz",
+      "control_range_meters": 80,
+      "video_range_meters": 150
+    },
+    "capabilities": {
+      "indoor_flight": true,
+      "outdoor_flight": true,
+      "acro_mode": true,
+      "angle_mode": true,
+      "horizon_mode": true,
+      "altitude_hold": false,
+      "gps_navigation": false,
+      "return_to_home": false,
+      "waypoint_navigation": false,
+      "follow_me": false,
+      "obstacle_avoidance": false,
+      "precision_landing": false
+    },
+    "video_system": {
+      "camera_resolution": "720p",
+      "frame_rate_fps": 60,
+      "field_of_view_degrees": 120,
+      "video_format": "NTSC/PAL",
+      "recording_capability": false,
+      "real_time_streaming": true,
+      "low_latency_ms": 50
+    },
+    "telemetry": {
+      "battery_monitoring": true,
+      "voltage_display": true,
+      "current_monitoring": false,
+      "rssi_monitoring": true,
+      "flight_mode_display": true,
+      "timer_display": true,
+      "basic_osd": true,
+      "advanced_telemetry": false,
+      "blackbox_logging": false
+    },
+    "control_characteristics": {
+      "responsiveness": "high",
+      "stability": "moderate",
+      "beginner_friendly": true,
+      "acro_performance": "excellent",
+      "wind_resistance": "light_winds_only",
+      "crash_durability": "moderate"
+    },
+    "flight_modes": [
+      {
+        "name": "Angle Mode",
+        "description": "Self-leveling mode for beginners",
+        "stability": "high",
+        "max_angle_degrees": 45
+      },
+      {
+        "name": "Horizon Mode", 
+        "description": "Hybrid mode with self-leveling on center stick",
+        "stability": "medium",
+        "max_angle_degrees": 90
+      },
+      {
+        "name": "Acro Mode",
+        "description": "Full manual control for advanced pilots",
+        "stability": "none",
+        "max_angle_degrees": 360
+      }
+    ],
+    "performance_limits": {
+      "max_climb_rate_fps": 8.0,
+      "max_descent_rate_fps": 6.0,
+      "max_horizontal_speed_fps": 35.0,
+      "max_rotation_rate_dps": 720.0,
+      "min_throttle_percent": 5,
+      "max_throttle_percent": 100,
+      "battery_cells": 1,
+      "battery_capacity_mah": 450,
+      "flight_time_minutes": 4
+    },
+    "recommended_use": {
+      "skill_level": "beginner_to_intermediate",
+      "primary_use": "indoor_fpv_learning",
+      "environment": "controlled_indoor_spaces",
+      "training_progression": "ideal_first_fpv_drone"
+    }
+  }
+}

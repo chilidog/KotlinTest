@@ -1,0 +1,89 @@
+{
+  "mission": {
+    "name": "Cetus Lite Beta FPV Demo Flight",
+    "description": "Demonstration mission: climb to 6 feet, pause 5 seconds, fly 6-foot diameter circle, controlled landing",
+    "drone_model": "Cetus Lite Beta FPV",
+    "duration_estimate_seconds": 45,
+    "safety_parameters": {
+      "max_altitude_feet": 10.0,
+      "max_speed_fps": 3.0,
+      "emergency_land_battery_percent": 20,
+      "geofence_radius_feet": 50.0,
+      "max_wind_speed_mph": 15.0
+    },
+    "environment": {
+      "indoor_safe": true,
+      "outdoor_capable": true,
+      "recommended_space": "20x20 feet minimum"
+    }
+  },
+  "commands": [
+    {
+      "id": 1,
+      "type": "TAKEOFF",
+      "description": "Launch and climb to 6 feet altitude",
+      "parameters": {
+        "target_altitude_feet": 6.0,
+        "climb_rate_fps": 2.0,
+        "stabilization_time_seconds": 2.0
+      },
+      "expected_duration_seconds": 5,
+      "safety_checks": ["battery_level", "motor_temps", "gps_lock"]
+    },
+    {
+      "id": 2,
+      "type": "HOVER",
+      "description": "Pause and stabilize at target altitude",
+      "parameters": {
+        "duration_seconds": 5,
+        "position_hold": true,
+        "altitude_tolerance_feet": 0.5,
+        "drift_correction": true
+      },
+      "expected_duration_seconds": 5,
+      "safety_checks": ["position_stability", "altitude_hold"]
+    },
+    {
+      "id": 3,
+      "type": "CIRCLE",
+      "description": "Execute 6-foot diameter circular flight pattern",
+      "parameters": {
+        "radius_feet": 3.0,
+        "speed_fps": 1.5,
+        "direction": "clockwise",
+        "altitude_feet": 6.0,
+        "num_revolutions": 1.0,
+        "smooth_entry": true
+      },
+      "expected_duration_seconds": 12,
+      "safety_checks": ["path_clear", "position_tracking", "speed_limits"]
+    },
+    {
+      "id": 4,
+      "type": "LAND",
+      "description": "Controlled descent and precision landing",
+      "parameters": {
+        "descent_rate_fps": 1.0,
+        "precision_landing": true,
+        "final_approach_height_feet": 1.0,
+        "touchdown_speed_fps": 0.2
+      },
+      "expected_duration_seconds": 8,
+      "safety_checks": ["landing_zone_clear", "descent_rate", "motor_shutdown"]
+    }
+  ],
+  "telemetry_config": {
+    "update_rate_hz": 10,
+    "data_points": [
+      "position_xyz",
+      "velocity_xyz", 
+      "battery_voltage",
+      "motor_temperatures",
+      "flight_mode",
+      "gps_satellites",
+      "signal_strength"
+    ],
+    "logging_enabled": true,
+    "real_time_display": true
+  }
+}

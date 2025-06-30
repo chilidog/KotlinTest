@@ -1,0 +1,22 @@
+{
+  "drone": {
+    "model": "Cetus Lite Beta FPV",
+    "commands": [
+      {
+        "type": "climb",
+        "altitude": 6
+      },
+      {
+        "type": "pause",
+        "duration": 5
+      },
+      {
+        "type": "circle",
+        "radius": 6
+      },
+      {
+        "type": "land"
+      }
+    ]
+  }
+}

@@ -2,11 +2,13 @@
 
 ## 🤖 FOR AGENT MODE SESSIONS
 
-**If you are an Agent Mode session directed to explore this project for WiFiLink 2 integration:**
+**If you are an Agent Mode session directed to explore this project for
+WiFiLink 2 integration:**
 
 ### 📍 You Are Here
 
-This is a **sophisticated hybrid drone control system** with working WebSocket + MAVLink communication that needs WiFiLink 2 video streaming integration.
+This is a **sophisticated hybrid drone control system** with working
+WebSocket + MAVLink communication that needs WiFiLink 2 video streaming integration.
 
 ### 🎯 Your Mission
 
@@ -27,7 +29,7 @@ Add WiFiLink 2 video streaming as a third protocol while preserving all existing
 
 ### 🔍 Project Structure
 
-```
+```text
 /workspaces/KotlinTest/
 ├── pom.xml                              ← Enhanced with MAVLink deps
 ├── src/main/kotlin/SimpleControlStation.kt ← Working hybrid demo

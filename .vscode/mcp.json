@@ -1,0 +1,30 @@
+{
+    "servers": {
+        "controlstation-filesystem": {
+            "command": "npx",
+            "args": [
+                "-y",
+                "@modelcontextprotocol/server-filesystem",
+                "/workspaces/KotlinTest",
+                "/workspaces/KotlinTest/src",
+                "/workspaces/KotlinTest/docs",
+                "/workspaces/KotlinTest/parrot-sdk-analysis",
+                "/workspaces/KotlinTest/parrot-arsdk-mcp-server"
+            ]
+        },
+        "parrot-arsdk": {
+            "command": "node",
+            "args": [
+                "/workspaces/KotlinTest/parrot-arsdk-mcp-server/dist/index.js",
+                "--bluetooth-adapter=auto",
+                "--log-level=info",
+                "--government-mode"
+            ],
+            "env": {
+                "ARSDK_LOG_LEVEL": "debug",
+                "BLUETOOTH_SCAN_TIMEOUT": "30000",
+                "NODE_ENV": "development"
+            }
+        }
+    }
+}
